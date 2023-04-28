@@ -1,0 +1,39 @@
+.montserrrat{
+    font-family: 'Montserrat', sans-serif;
+}
+
+html{
+    scroll-behavior: smooth;
+}
+
+.box-shadow{
+    -webkit-box-shadow: 0px 0px 16px -6px rgba(0,0,0,0.59);
+    box-shadow: 0px 0px 16px -6px rgba(0,0,0,0.59)
+}
+
+.table tr.active{
+background-color: #1dbf730f;
+
+}
+
+.message{
+   flex-direction: row-reverse; 
+   align-self: flex-end;
+
+}
+
+.message > p{
+    border-radius: 20px 0px 20px 20px;
+    background-color: royalblue;
+    color: white;
+}
+
+.container label{
+color:gray;
+font-size: 18px;
+}
+
+.container select,.container input, .container textarea{
+    padding: 20px;
+    border: 1px solid rgb(227, 227, 227);
+} 
