@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import newRequest from "../../utils/newRequest";
+import { useLocation } from "react-router-dom";
+
+
 import img1 from "../assets/search-icon.svg";
-import GigCard from "../components/GigCard";
 import img2 from "../assets/face3.webp";
+import GigCard from "../components/GigCard";
 
 const gigs = [
   {
@@ -89,11 +94,38 @@ const gigs = [
 const Gigs = () => {
   const [openOpitons, setOpenOpitons] = useState(false);
   const [sort, setSort] = useState("sales");
+   const minRef = useRef();
+   const maxRef = useRef();
+
+   const { search } = useLocation();
+
+   const { isLoading, error, data, refetch } = useQuery({
+     queryKey: ["gigs"],
+     queryFn: () =>
+       newRequest
+         .get(
+           `/gigs${search}&min=${minRef.current.value}&max=${maxRef.current.value}&sort=${sort}`
+         )
+         .then((res) => {
+           return res.data;
+         }),
+   });
 
   const reSort = (type) => {
     setSort(type);
     setOpenOpitons(false);
   };
+
+   useEffect(() => {
+     refetch();
+   }, [sort]);
+
+   const apply = () => {
+     refetch();
+   };
+
+
+
   return (
     <main className="flex justify-center ">
       <div className="w-[1440px]  py-[30px] px-0 flex flex-col gap-[15px]">
@@ -109,15 +141,20 @@ const Gigs = () => {
             <span className="">Budget</span>
             <input
               type="text"
+              ref={minRef}
               className="p-[5px] border-[1px] border-[lightgray] outline-none placeholder:text-[gray]"
               placeholder="min"
             />
             <input
               type="text"
+              ref={maxRef}
               className="p-[5px] border-[1px] border-[lightgray] outline-none placeholder:text-[gray]"
               placeholder="max"
             />
-            <button className=" bg-[#1dbf73] text-white font-medium border-none cursor-pointer py-[5px] px-[10px] rounded-[5px]">
+            <button
+              className=" bg-[#1dbf73] text-white font-medium border-none cursor-pointer py-[5px] px-[10px] rounded-[5px]"
+              onClick={apply}
+            >
               Apply
             </button>
           </div>
@@ -153,9 +190,12 @@ const Gigs = () => {
           </div>
         </section>
         <section className="flex flex-wrap justify-between">
-          {gigs.map((gig) => (
-            <GigCard item={gig} key={gig.id} />
-          ))}
+          {isLoading
+            ? "loading"
+            : error
+            ? "Something went wrong!"
+            : data.map((gig) => <GigCard key={gig._id} item={gig} />)}
+         
         </section>
       </div>
     </main>

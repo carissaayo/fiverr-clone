@@ -1,10 +1,27 @@
 import { useEffect, useState } from "react";
-import { Link ,useLocation} from "react-router-dom";
-import userImg from "../assets/face3.webp"
+import { Link ,useLocation, useNavigate} from "react-router-dom";
+import { UserIcon } from "@heroicons/react/24/solid";
+import newRequest from "../utils/newRequest";
+
+
+
 const Navbar = () => {
+const navigate = useNavigate();
+
   const [active, setActive] = useState(false);
 const [openOptions, setOpenOptions] = useState(false)
 const {pathname} =useLocation()
+
+const handleLogout= async()=>{
+  try {
+    await newRequest.post("/auth/logout")
+      localStorage.setItem("user",null);
+      navigate("/");
+
+  } catch (error) {
+    console.log(error);
+  }
+}
   const isActive = () => {
     window.scrollY > 0 ? setActive(true) : setActive(false);
   };
@@ -15,11 +32,7 @@ const {pathname} =useLocation()
     };
   }, []);
 
-  const currentUser = {
-    id: 1,
-    username: "John Doe",
-    isSeller: true,
-  };
+  const currentUser = JSON.parse(localStorage.getItem("user"));
 
   return (
     <div
@@ -53,11 +66,16 @@ const {pathname} =useLocation()
               className="flex items-center gap-[10px] cursor-pointer relative"
               onClick={() => setOpenOptions(!openOptions)}
             >
-              <img
-                src={userImg}
-                alt=""
-                className="w-[32px] h-[32px] rounded-full object-cover"
-              />
+              {currentUser?.img ? (
+                <img
+                  src={currentUser?.img}
+                  alt=""
+                  className="w-[32px] h-[32px] rounded-full object-cover"
+                />
+              ) : (
+                <UserIcon className=" w-[20px] h-[20px]  " />
+              )}
+
               <span className="">{currentUser?.username}</span>
               {openOptions && (
                 <div className="absolute top-[50px] right-0 p-[20px] bg-white rounded-[10px] border-1 border-solid border-gray-300 flex flex-col gap-[10px]  text-gray-500 w-[200px] font-[300]">
@@ -77,7 +95,7 @@ const {pathname} =useLocation()
                   <Link to="/messages" className="">
                     Messages
                   </Link>
-                  <Link to="/" className="">
+                  <Link to="/" className="" onClick={handleLogout}>
                     Logout
                   </Link>
                 </div>
